@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "21c45c9e-d606-41ad-87e0-74809a8df48e",
+		"name": "Azure DevOps Test Case Management Copy 2",
+		"description": "Collection for Azure DevOps to get user story and create test case",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "29683177"
+	},
+	"item": [
+		{
+			"name": "Create Multiple Test Case",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"op\": \"add\",\r\n    \"path\": \"/fields/System.Title\",\r\n    \"value\": \"{{title}} (_AI generated)\"\r\n  },\r\n  {\r\n    \"op\": \"add\",\r\n    \"path\": \"/fields/Microsoft.VSTS.TCM.Steps\",\r\n    \"value\": \"{{steps}}\"\r\n  },\r\n  {\r\n    \"op\": \"add\",\r\n    \"path\": \"/fields/System.Tags\",\r\n    \"value\": \"{{tags}}\"\r\n  },\r\n  {\r\n    \"op\": \"add\",\r\n    \"path\": \"/relations/-\",\r\n    \"value\": {\r\n      \"rel\": \"System.LinkTypes.Dependency-Reverse\",\r\n      \"url\": \"{{url}}\",\r\n      \"attributes\": {\r\n        \"comment\": \"Test case linked to user story\"\r\n      }\r\n    }\r\n  }\r\n]\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dev.azure.com/{{Organization }}/{{project}}/_apis/wit/workitems/$Test%20Case?api-version=7.1-preview.3",
+					"protocol": "https",
+					"host": [
+						"dev",
+						"azure",
+						"com"
+					],
+					"path": [
+						"{{Organization }}",
+						"{{project}}",
+						"_apis",
+						"wit",
+						"workitems",
+						"$Test%20Case"
+					],
+					"query": [
+						{
+							"key": "api-version",
+							"value": "7.1-preview.3"
+						}
+					]
+				},
+				"description": "Generated from cURL:  curl --location 'https://dev.azure.com/FawryFIS/10-02-Payout/_apis/wit/workitems/$Test%20Case?api-version=7.1-preview.3' \\\r\n    --header 'Content-Type: application/json-patch+json' \\\r\n    --header \"Authorization: Bearer ${AUTH_TOKEN}\" \\\r\n    --data \"[\r\n        {\r\n            \\\"op\\\": \\\"add\\\",\r\n            \\\"path\\\": \\\"/fields/System.Title\\\",\r\n            \\\"value\\\": \\\"${TITLE}\\\"\r\n        },\r\n        {\r\n            \\\"op\\\": \\\"add\\\",\r\n            \\\"path\\\": \\\"/relations/-\\\",\r\n            \\\"value\\\": {\r\n                \\\"rel\\\": \\\"System.LinkTypes.Hierarchy-Reverse\\\",\r\n                \\\"url\\\": \\\"${URL}\\\"\r\n            }\r\n        }\r\n    ]\""
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Story (Description and Acceptance criteria) by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const cheerio = require('cheerio');\r",
+							"\r",
+							"// Function to convert HTML to plain text\r",
+							"function htmlToText(html) {\r",
+							"    const $ = cheerio.load(html);\r",
+							"    return $.text();\r",
+							"}\r",
+							"\r",
+							"// Extract the Description and Acceptance Criteria\r",
+							"const descriptionHTML = pm.response.json().fields[\"System.Description\"] || \"\";\r",
+							"const acceptanceHTML = pm.response.json().fields[\"Microsoft.VSTS.Common.AcceptanceCriteria\"] || \"\";\r",
+							"\r",
+							"// Log the cleaned output\r",
+							"console.log(\"📝 Description:\", htmlToText(descriptionHTML));\r",
+							"console.log(\"✅ Acceptance Criteria:\", htmlToText(acceptanceHTML));\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://dev.azure.com/{{Organization }}/_apis/wit/workitems/{{workItemId}}?fields=System.Title,System.Description,Microsoft.VSTS.Common.AcceptanceCriteria&api-version=7.0",
+					"protocol": "https",
+					"host": [
+						"dev",
+						"azure",
+						"com"
+					],
+					"path": [
+						"{{Organization }}",
+						"_apis",
+						"wit",
+						"workitems",
+						"{{workItemId}}"
+					],
+					"query": [
+						{
+							"key": "fields",
+							"value": "System.Title,System.Description,Microsoft.VSTS.Common.AcceptanceCriteria"
+						},
+						{
+							"key": "api-version",
+							"value": "7.0"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
